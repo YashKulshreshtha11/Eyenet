@@ -66,8 +66,6 @@ vc_redist.x64.exe
 
 # Temporary and working directories
 scratch/
-archive/
-use_this/
 project.zip
 
 # Cursor IDE files
