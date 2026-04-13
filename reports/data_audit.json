@@ -1,0 +1,51 @@
+{
+  "dataset_root": "d:\\Drive_Folder\\final_year_project\\use_this\\archive\\dataset",
+  "pre_split": false,
+  "counts": {
+    "train": 2949,
+    "val": 631,
+    "test": 637,
+    "total": 4217
+  },
+  "distribution": {
+    "train": {
+      "diabetic_retinopathy": 768,
+      "glaucoma": 704,
+      "cataract": 726,
+      "normal": 751
+    },
+    "val": {
+      "diabetic_retinopathy": 164,
+      "glaucoma": 151,
+      "cataract": 155,
+      "normal": 161
+    },
+    "test": {
+      "diabetic_retinopathy": 166,
+      "glaucoma": 152,
+      "cataract": 157,
+      "normal": 162
+    }
+  },
+  "folder_issues": {
+    "root": []
+  },
+  "leakage_by_filename": {
+    "train_vs_val": 0,
+    "train_vs_test": 1,
+    "val_vs_test": 0
+  },
+  "duplicate_files_by_md5": {
+    "count_groups": 2,
+    "examples": [
+      [
+        "d:\\Drive_Folder\\final_year_project\\use_this\\archive\\dataset\\glaucoma\\1415_right.jpg",
+        "d:\\Drive_Folder\\final_year_project\\use_this\\archive\\dataset\\cataract\\1415_right.jpg"
+      ],
+      [
+        "d:\\Drive_Folder\\final_year_project\\use_this\\archive\\dataset\\cataract\\625_left.jpg",
+        "d:\\Drive_Folder\\final_year_project\\use_this\\archive\\dataset\\glaucoma\\625_left.jpg"
+      ]
+    ]
+  }
+}

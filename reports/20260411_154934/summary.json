@@ -1,0 +1,32 @@
+{
+  "model": "EyeNet Elite Ensemble (ResNet50 + EffNetB0 + DenseNet121)",
+  "best_validation_macro_f1": 0.8253,
+  "final_validation_loss": 0.3031,
+  "final_validation_accuracy": 0.8384,
+  "final_validation_macro_f1": 0.8364,
+  "weights_path": "weights\\eyenet_ensemble_optimized.pth",
+  "reports_dir": "D:\\Drive_Folder\\final_year_project\\project\\reports\\20260411_154934",
+  "class_names": [
+    "Diabetic Retinopathy",
+    "Glaucoma",
+    "Cataract",
+    "Normal"
+  ],
+  "epochs_completed": 10,
+  "timestamp": "2026-04-11T20:13:27.526297",
+  "train_config": {
+    "epochs_budget": 20,
+    "mixup_alpha": 0.2,
+    "mixup_in_warmup": false,
+    "label_smoothing": 0.1,
+    "class_weights": true,
+    "dr_boost": 1.35,
+    "glaucoma_boost": 1.35,
+    "focal_gamma": 2.0,
+    "scheduler": "one_cycle_per_phase",
+    "phase_split": "0.45_warmup_0.35_partial_0.20_full"
+  },
+  "test_loss": 0.2611,
+  "test_accuracy": 0.8367,
+  "test_macro_f1": 0.8342
+}

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EyeNet Elite – AI-Powered Retinal Diagnostics</title>
+    <meta name="description" content="Medical-grade AI retinal disease classification using a triple-model ensemble of EfficientNet, ResNet and Vision Transformer." />
+    <meta name="theme-color" content="#05080f" />
+
+    <!-- Favicon inline SVG eye -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%2305080f'/><ellipse cx='16' cy='16' rx='11' ry='7' stroke='%2300cfe8' stroke-width='1.5' fill='none'/><circle cx='16' cy='16' r='4' fill='%2300cfe8'/><circle cx='16' cy='16' r='2' fill='%2305080f'/></svg>" />
+
+    <!-- Preconnect for fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <style>
+      /* Loading screen - shown while React bootstraps */
+      #loading-screen {
+        position: fixed;
+        inset: 0;
+        background: #05080f;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5rem;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+
+      #loading-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .loader-eye {
+        position: relative;
+        width: 72px;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .loader-eye svg {
+        animation: loader-blink 2.5s ease-in-out infinite;
+      }
+
+      @keyframes loader-blink {
+        0%, 90%, 100% { transform: scaleY(1); }
+        95% { transform: scaleY(0.08); }
+      }
+
+      .loader-ring {
+        position: absolute;
+        inset: -10px;
+        border-radius: 50%;
+        border: 1.5px solid transparent;
+        border-top-color: #00cfe8;
+        border-right-color: rgba(0,207,232,0.3);
+        animation: loader-spin 1.4s linear infinite;
+      }
+
+      .loader-ring-2 {
+        inset: -20px;
+        border-top-color: transparent;
+        border-bottom-color: rgba(61,142,245,0.4);
+        animation-duration: 2.2s;
+        animation-direction: reverse;
+      }
+
+      @keyframes loader-spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .loader-text {
+        font-family: 'Courier New', monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(0,207,232,0.6);
+        animation: loader-fade 1.8s ease-in-out infinite;
+      }
+
+      @keyframes loader-fade {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 1; }
+      }
+
+      .loader-bar-wrap {
+        width: 180px;
+        height: 2px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 1px;
+        overflow: hidden;
+      }
+
+      .loader-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #00cfe8, #3d8ef5);
+        border-radius: 1px;
+        animation: loader-bar 2s cubic-bezier(.4,0,.2,1) infinite;
+      }
+
+      @keyframes loader-bar {
+        0% { width: 0%; margin-left: 0; }
+        50% { width: 70%; margin-left: 0; }
+        100% { width: 0%; margin-left: 100%; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Loading screen -->
+    <div id="loading-screen" role="status" aria-label="Loading EyeNet Elite">
+      <div class="loader-eye">
+        <div class="loader-ring"></div>
+        <div class="loader-ring loader-ring-2"></div>
+        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="22" cy="22" rx="16" ry="10" stroke="#00cfe8" stroke-width="1.5"/>
+          <circle cx="22" cy="22" r="6" fill="none" stroke="#00cfe8" stroke-width="1.5"/>
+          <circle cx="22" cy="22" r="2.5" fill="#00cfe8"/>
+        </svg>
+      </div>
+      <div class="loader-text">Initializing Diagnostic Engine</div>
+      <div class="loader-bar-wrap">
+        <div class="loader-bar"></div>
+      </div>
+    </div>
+
+    <!-- React root -->
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      // Hide loader once React has mounted
+      window.__hideLoader = function() {
+        const el = document.getElementById('loading-screen');
+        if (el) el.classList.add('hidden');
+      };
+
+      // Fallback: hide after 4s max
+      setTimeout(function() {
+        const el = document.getElementById('loading-screen');
+        if (el) el.classList.add('hidden');
+      }, 4000);
+    </script>
+  </body>
+</html>

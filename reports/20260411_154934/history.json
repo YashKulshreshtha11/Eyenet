@@ -1,0 +1,112 @@
+[
+  {
+    "epoch": 1,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.537,
+    "train_accuracy": 0.5878,
+    "val_loss": 0.3263,
+    "val_accuracy": 0.7417,
+    "val_macro_f1": 0.7424,
+    "lr": 0.00099961,
+    "seconds": 1785.72
+  },
+  {
+    "epoch": 2,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.4751,
+    "train_accuracy": 0.6195,
+    "val_loss": 0.2983,
+    "val_accuracy": 0.6957,
+    "val_macro_f1": 0.6658,
+    "lr": 0.00095503,
+    "seconds": 1590.82
+  },
+  {
+    "epoch": 3,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.438,
+    "train_accuracy": 0.6511,
+    "val_loss": 0.2842,
+    "val_accuracy": 0.7338,
+    "val_macro_f1": 0.712,
+    "lr": 0.00084286,
+    "seconds": 1598.47
+  },
+  {
+    "epoch": 4,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.4007,
+    "train_accuracy": 0.6691,
+    "val_loss": 0.3088,
+    "val_accuracy": 0.8273,
+    "val_macro_f1": 0.8253,
+    "lr": 0.00067975,
+    "seconds": 1468.12
+  },
+  {
+    "epoch": 5,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.3922,
+    "train_accuracy": 0.6717,
+    "val_loss": 0.2516,
+    "val_accuracy": 0.8019,
+    "val_macro_f1": 0.8066,
+    "lr": 0.00048994,
+    "seconds": 1471.03
+  },
+  {
+    "epoch": 6,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.3806,
+    "train_accuracy": 0.695,
+    "val_loss": 0.2305,
+    "val_accuracy": 0.7861,
+    "val_macro_f1": 0.7784,
+    "lr": 0.00030163,
+    "seconds": 1444.91
+  },
+  {
+    "epoch": 7,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.37,
+    "train_accuracy": 0.6997,
+    "val_loss": 0.2386,
+    "val_accuracy": 0.7924,
+    "val_macro_f1": 0.7853,
+    "lr": 0.00014278,
+    "seconds": 1445.71
+  },
+  {
+    "epoch": 8,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.3606,
+    "train_accuracy": 0.7032,
+    "val_loss": 0.2308,
+    "val_accuracy": 0.8098,
+    "val_macro_f1": 0.8089,
+    "lr": 3.7e-05,
+    "seconds": 1468.1
+  },
+  {
+    "epoch": 9,
+    "phase": "Fusion Warmup",
+    "train_loss": 0.3453,
+    "train_accuracy": 0.7196,
+    "val_loss": 0.2332,
+    "val_accuracy": 0.8162,
+    "val_macro_f1": 0.8134,
+    "lr": 0.0,
+    "seconds": 1465.06
+  },
+  {
+    "epoch": 10,
+    "phase": "Selective Unfreeze",
+    "train_loss": 0.4734,
+    "train_accuracy": 0.4838,
+    "val_loss": 0.2421,
+    "val_accuracy": 0.7797,
+    "val_macro_f1": 0.7805,
+    "lr": 0.00039774,
+    "seconds": 1808.98
+  }
+]

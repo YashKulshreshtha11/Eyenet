@@ -1,0 +1,39 @@
+{
+  "Diabetic Retinopathy": {
+    "precision": 1.0,
+    "recall": 0.4,
+    "f1-score": 0.5714285714285714,
+    "support": 80.0
+  },
+  "Glaucoma": {
+    "precision": 0.8979591836734694,
+    "recall": 0.55,
+    "f1-score": 0.6821705426356589,
+    "support": 80.0
+  },
+  "Cataract": {
+    "precision": 0.8588235294117647,
+    "recall": 0.9125,
+    "f1-score": 0.8848484848484849,
+    "support": 80.0
+  },
+  "Normal": {
+    "precision": 0.487012987012987,
+    "recall": 0.9375,
+    "f1-score": 0.6410256410256411,
+    "support": 80.0
+  },
+  "accuracy": 0.7,
+  "macro avg": {
+    "precision": 0.8109489250245553,
+    "recall": 0.7,
+    "f1-score": 0.694868309984589,
+    "support": 320.0
+  },
+  "weighted avg": {
+    "precision": 0.8109489250245552,
+    "recall": 0.7,
+    "f1-score": 0.694868309984589,
+    "support": 320.0
+  }
+}
