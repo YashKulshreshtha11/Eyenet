@@ -6,7 +6,10 @@ weights/*.pth filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
 *.pb filter=lfs diff=lfs merge=lfs -text
 *.onnx filter=lfs diff=lfs merge=lfs -text
-
 # Other large binaries
 *.exe filter=lfs diff=lfs merge=lfs -text
 *.zip filter=lfs diff=lfs merge=lfs -text
+use_this/**/*.png filter=lfs diff=lfs merge=lfs -text
+use_this/**/*.xlsx filter=lfs diff=lfs merge=lfs -text
+use_this/**/*.json filter=lfs diff=lfs merge=lfs -text
+use_this/**/*.jpg filter=lfs diff=lfs merge=lfs -text
