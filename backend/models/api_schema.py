@@ -27,6 +27,7 @@ class PredictionResponse(BaseModel):
     gradcam_base64: str = Field(..., description="Grad-CAM heatmap PNG")
     overlay_base64: str = Field(..., description="Grad-CAM overlay PNG")
     inference_time_ms: float = Field(..., description="End-to-end inference latency")
+    state: str = Field("Delhi", description="User state for localized doctor referral")
     record_id: Optional[str] = Field(None, description="MongoDB record id when available")
 
 
@@ -46,10 +47,11 @@ class HistoryRecord(BaseModel):
     image_name: str
     timestamp: str
     predicted_class: str
-    probabilities: Dict[str, float]
-    inference_time_ms: float
+    probabilities: Optional[Dict[str, float]] = None
+    inference_time_ms: Optional[float] = None
     gradcam_base64: Optional[str] = None
     overlay_base64: Optional[str] = None
+    state: Optional[str] = "Delhi"
 
 
 class HistoryResponse(BaseModel):

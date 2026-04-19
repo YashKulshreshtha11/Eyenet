@@ -8,11 +8,13 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT, TA_CENTER, TA_RIGHT, TA_JUSTIFY
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
-    HRFlowable, KeepTogether
+    HRFlowable, KeepTogether, PageBreak
 )
 from reportlab.graphics.shapes import Drawing, Rect, String, Line
 from reportlab.graphics import renderPDF
 from reportlab.platypus.flowables import Flowable
+
+from backend.services.doctors import get_doctor_details, get_all_doctor_records
 
 # ── Brand colours ────────────────────────────────────────────────────────────
 NAVY        = colors.HexColor("#0F172A")
@@ -497,7 +499,85 @@ def generate_medical_report(record: Dict[str, Any], output_path: str):
     ))
     story.append(Spacer(1, 10))
 
-    # ── 9. CLINICIAN SIGN-OFF ────────────────────────────────────────────────
+    story.append(Spacer(1, 10))
+
+    # ── 9. ALL-INDIA SPECIALIST REFERRAL DIRECTORY (separate last page) ───────
+    story.append(PageBreak())
+
+    story.append(SectionHeader(
+        f"Pan-India Specialist Referral Directory — {pred_class}"
+    ))
+    story.append(Spacer(1, 4))
+    story.append(Paragraph(
+        f"The following table lists recommended ophthalmologists / eye care centres across "
+        f"all 28 states of India specialising in "
+        f"<b>{pred_class}</b>. "
+        f"Patients are encouraged to consult the specialist nearest to their location.",
+        ParagraphStyle("refdir", fontSize=8.5, leading=13, textColor=SLATE, fontName="Helvetica")
+    ))
+    story.append(Spacer(1, 8))
+
+    all_doctors = get_all_doctor_records(pred_class)
+
+    # ── Table header
+    ref_table_data = [[
+        Paragraph("<b>State</b>",               ParagraphStyle("rth", fontSize=8, textColor=WHITE, fontName="Helvetica-Bold")),
+        Paragraph("<b>Specialist / Centre</b>", ParagraphStyle("rth", fontSize=8, textColor=WHITE, fontName="Helvetica-Bold")),
+        Paragraph("<b>Specialization</b>",      ParagraphStyle("rth", fontSize=8, textColor=WHITE, fontName="Helvetica-Bold")),
+        Paragraph("<b>Clinic / Hospital</b>",   ParagraphStyle("rth", fontSize=8, textColor=WHITE, fontName="Helvetica-Bold")),
+        Paragraph("<b>Contact</b>",             ParagraphStyle("rth", fontSize=8, textColor=WHITE, fontName="Helvetica-Bold")),
+    ]]
+
+    row_style_even = colors.HexColor("#EEF2F7")
+    row_style_odd  = WHITE
+
+    row_backgrounds = []
+    for idx, entry in enumerate(all_doctors):
+        ref_table_data.append([
+            Paragraph(entry["state"],                  ParagraphStyle("rtd", fontSize=7.5, textColor=NAVY, fontName="Helvetica-Bold", leading=11)),
+            Paragraph(entry.get("name", ""),           ParagraphStyle("rtd", fontSize=7.5, textColor=NAVY, fontName="Helvetica", leading=11)),
+            Paragraph(entry.get("specialization", ""), ParagraphStyle("rtd", fontSize=7.5, textColor=SLATE, fontName="Helvetica", leading=11)),
+            Paragraph(entry.get("clinic", ""),         ParagraphStyle("rtd", fontSize=7.5, textColor=SLATE, fontName="Helvetica", leading=11)),
+            Paragraph(entry.get("contact", ""),        ParagraphStyle("rtd", fontSize=7, textColor=MID_GREY, fontName="Helvetica", leading=10)),
+        ])
+        row_backgrounds.append(row_style_even if idx % 2 == 0 else row_style_odd)
+
+    ref_table = Table(
+        ref_table_data,
+        colWidths=[32*mm, 38*mm, 38*mm, 52*mm, 34*mm],
+        repeatRows=1
+    )
+
+    # Build per-row background commands
+    ts_cmds = [
+        ("BACKGROUND",   (0, 0), (-1, 0), NAVY),
+        ("TEXTCOLOR",    (0, 0), (-1, 0), WHITE),
+        ("FONTSIZE",     (0, 0), (-1, -1), 7.5),
+        ("VALIGN",       (0, 0), (-1, -1), "TOP"),
+        ("TOPPADDING",   (0, 0), (-1, -1), 5),
+        ("BOTTOMPADDING",(0, 0), (-1, -1), 5),
+        ("LEFTPADDING",  (0, 0), (-1, -1), 6),
+        ("GRID",         (0, 0), (-1, -1), 0.3, LIGHT_GREY),
+    ]
+    for i, bg in enumerate(row_backgrounds):
+        ts_cmds.append(("BACKGROUND", (0, i + 1), (-1, i + 1), bg))
+
+    ref_table.setStyle(TableStyle(ts_cmds))
+    story.append(ref_table)
+    story.append(Spacer(1, 10))
+
+    story.append(Paragraph(
+        "<b>Note:</b> The specialists listed above are indicative recommendations based on publicly available "
+        "information and institutional directories. EyeNet DSS does not endorse any individual practitioner. "
+        "Patients should verify availability and consult their primary physician before booking an appointment. "
+        "For emergencies, please contact the nearest government eye hospital or dial <b>104</b>.",
+        ParagraphStyle("refnote", fontSize=7.5, leading=11, textColor=MID_GREY,
+                       fontName="Helvetica-Oblique", backColor=SLATE_LIGHT,
+                       borderColor=LIGHT_GREY, borderWidth=0.5, borderPadding=6)
+    ))
+    story.append(Spacer(1, 15))
+
+    # ── 10. CLINICIAN SIGN-OFF ────────────────────────────────────────────────
     story.append(SectionHeader("Clinician Review & Sign-Off"))
     story.append(Spacer(1, 4))
 

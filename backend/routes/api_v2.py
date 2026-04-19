@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
 
 from backend.config import ALLOWED_IMAGE_TYPES
 from backend.models.api_schema import (
@@ -43,7 +43,10 @@ async def metadata():
 
 
 @router.post("/predict", response_model=PredictionResponse, tags=["Prediction"])
-async def predict(file: UploadFile = File(..., description="Retinal fundus image")):
+async def predict(
+    file: UploadFile = File(..., description="Retinal fundus image"),
+    state: str = Form("Delhi", description="User's state for localized doctor referral")
+):
     if file.content_type not in ALLOWED_IMAGE_TYPES:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
@@ -64,7 +67,7 @@ async def predict(file: UploadFile = File(..., description="Retinal fundus image
         import traceback
         full_tb = traceback.format_exc()
         logger.exception("Unexpected inference error")
-        log_event("prediction_error", str(exc) + "\\n---\\n" + full_tb, {"filename": file.filename})
+        log_event("prediction_error", str(exc) + "\n---\n" + full_tb, {"filename": file.filename})
         raise HTTPException(status_code=500, detail="Internal inference error.")
 
     record_id = save_prediction(
@@ -74,6 +77,7 @@ async def predict(file: UploadFile = File(..., description="Retinal fundus image
         inference_time_ms=result["inference_time_ms"],
         gradcam_base64=result.get("gradcam_base64"),
         overlay_base64=result.get("overlay_base64"),
+        state=state,
     )
 
     log_event(
@@ -86,21 +90,47 @@ async def predict(file: UploadFile = File(..., description="Retinal fundus image
         },
     )
 
-    return PredictionResponse(**result, record_id=record_id)
+    return PredictionResponse(**result, record_id=record_id, state=state)
 
 
-@router.get("/history", response_model=HistoryResponse, tags=["History"])
+@router.get("/history", tags=["History"])
 async def prediction_history(limit: int = 50, skip: int = 0):
     records_raw = get_history(limit=limit, skip=skip)
     records = []
     for record in records_raw:
+        # Ensure ID is string and available as 'id' for frontend
+        if "_id" in record:
+            record["id"] = str(record["_id"])
+        
         ts = record.get("timestamp")
         if isinstance(ts, datetime.datetime):
             record["timestamp"] = ts.isoformat() + "Z"
         else:
             record["timestamp"] = str(ts)
+            
+        # Strip heavy base64 blobs from the list view — fetch them via /record/{id}
+        record.pop("gradcam_base64", None)
+        record.pop("overlay_base64", None)
         records.append(record)
-    return HistoryResponse(records=records, total=len(records))
+    return {"records": records, "total": len(records)}
+
+
+@router.get("/record/{record_id}", tags=["History"])
+async def get_record(record_id: str):
+    """Return the full record including heatmap base64 fields."""
+    record = get_record_by_id(record_id)
+    if not record:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Record not found: {record_id}",
+        )
+    ts = record.get("timestamp")
+    record["_id"] = str(record["_id"])
+    if isinstance(ts, datetime.datetime):
+        record["timestamp"] = ts.isoformat() + "Z"
+    else:
+        record["timestamp"] = str(ts)
+    return record
 
 
 @router.delete("/record/{record_id}", tags=["History"])

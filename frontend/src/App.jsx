@@ -4,7 +4,7 @@ import {
   Upload, Eye, Activity, FileText,
   AlertCircle, CheckCircle2, ChevronRight,
   Download, Image as ImageIcon, BrainCircuit, X,
-  Scan, Zap, Database, Clock, Target, ArrowLeft,
+  Scan, Zap, Database, Clock, Target, ArrowLeft, MapPin,
   RefreshCw, AlertTriangle, BarChart2, Layers, Server, FolderOpen, Gauge, Trash2, ShieldAlert
 } from 'lucide-react';
 import {
@@ -16,6 +16,10 @@ const API_BASE = (import.meta.env.VITE_API_BASE || "/api/v1").replace(/\/+$/, ''
 
 /* ── Tiny helpers ─────────────────────────────────────────── */
 const cls = (...args) => args.filter(Boolean).join(' ');
+
+const INDIAN_STATES = [
+  'Delhi', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'West Bengal', 'Gujarat'
+];
 
 const SEVERITY_MAP = {
   normal: { color: 'var(--green)', bg: 'var(--green-10)', label: 'NORMAL' },
@@ -114,6 +118,7 @@ const App = () => {
   const [dragOver, setDragOver] = useState(false);
   const [analyzeProgress, setAnalyzeProgress] = useState(0);
   const [health, setHealth] = useState({ ready: false, modelLoaded: false, dbAlive: false });
+  const [patientState, setPatientState] = useState('Delhi');
   const fileInputRef = useRef(null);
   const progressRef = useRef(null);
   const analyzeTimeoutRef = useRef(null);
@@ -161,6 +166,21 @@ const App = () => {
     } catch (err) {
       console.error(err);
       alert("Error deleting record. Please try again.");
+    }
+  };
+
+  const fetchFullRecord = async (item) => {
+    // Optimistically show with whatever data we have, then enrich with heatmap
+    setSelectedRecord(item);
+    try {
+      const resp = await fetch(`${API_BASE}/record/${item.id || item._id}`);
+      if (!resp.ok) return;
+      const full = await resp.json();
+      // Map _id -> id for consistency
+      if (full._id && !full.id) full.id = full._id;
+      setSelectedRecord(full);
+    } catch (err) {
+      console.error("Failed to fetch full record", err);
     }
   };
 
@@ -242,6 +262,7 @@ const App = () => {
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('state', patientState);
     try {
       // ✅ NEW — paste this instead
 const resp = await fetch(`${API_BASE}/predict`, { method: 'POST', body: formData });
@@ -380,6 +401,7 @@ if (!resp.ok) {
                     <span>{history.length} Records</span>
                   </div>
                 </div>
+
 
                 <div className={cls('upload-zone', dragOver && 'upload-zone--drag', preview && 'upload-zone--filled')}
                   onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -666,7 +688,7 @@ if (!resp.ok) {
                       const maxP = Math.max(...Object.values(item.probabilities || {}));
                       const sev = getSeverity(item.predicted_class);
                       return (
-                        <tr key={idx} onClick={() => setSelectedRecord(item)} className="history-row">
+                        <tr key={item.id || item._id || idx} onClick={() => fetchFullRecord(item)} className="history-row">
                           <td className="history-idx">{String(idx + 1).padStart(2, '0')}</td>
                           <td className="history-file">
                             <div className="history-file-icon"><ImageIcon size={12} /></div>
@@ -675,7 +697,7 @@ if (!resp.ok) {
                           <td>
                             <span className="verdict-pill" style={{ '--vc': sev.color, '--vbg': sev.bg }}>
                               <span className="verdict-pip" />
-                              {item.predicted_class.replace(/_/g, ' ')}
+                              {(item.predicted_class || 'Unknown').replace(/_/g, ' ')}
                             </span>
                           </td>
                           <td>
@@ -688,17 +710,17 @@ if (!resp.ok) {
                           </td>
                           <td className="history-time">
                             <Clock size={11} />
-                            {new Date(item.timestamp).toLocaleString()}
+                            {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}
                           </td>
                           <td>
                             <div className="history-actions">
-                              <button className="history-action-btn" title="Download Report" onClick={(e) => { e.stopPropagation(); downloadReport(item.id); }}>
+                              <button className="history-action-btn" title="Download Report" onClick={(e) => { e.stopPropagation(); downloadReport(item.id || item._id); }}>
                                 <Download size={13} />
                               </button>
                               <button className="history-action-btn history-action-btn--danger" title="Delete Record" onClick={(e) => { e.stopPropagation(); deleteRecordRequest(item); }}>
                                 <Trash2 size={13} />
                               </button>
-                              <button className="history-action-btn history-action-btn--primary">
+                              <button className="history-action-btn history-action-btn--primary" onClick={(e) => { e.stopPropagation(); fetchFullRecord(item); }}>
                                 <ChevronRight size={13} />
                               </button>
                             </div>

@@ -77,6 +77,7 @@ def save_prediction(
     inference_time_ms: float,
     gradcam_base64: str | None = None,
     overlay_base64: str | None = None,
+    state: str = "Delhi",
 ) -> Optional[str]:
     """
     Persist a prediction record.
@@ -95,6 +96,7 @@ def save_prediction(
         "inference_time_ms": inference_time_ms,
         "gradcam_base64":    gradcam_base64,
         "overlay_base64":    overlay_base64,
+        "state":             state,
     }
     try:
         result = db[HIST_COL].insert_one(doc)
