@@ -3,8 +3,13 @@ from __future__ import annotations
 import logging
 import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
+
+# Load environment variables FIRST before any other imports
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -24,8 +29,6 @@ from backend.config import (  # noqa: E402
 from backend.routes.api_v2 import router  # noqa: E402
 from backend.services import prediction_service  # noqa: E402
 from database.db import close_db  # noqa: E402
-
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 logging.basicConfig(
     level=logging.INFO,

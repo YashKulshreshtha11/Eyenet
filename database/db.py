@@ -42,14 +42,20 @@ def get_db() -> Optional[Database]:
         return _db
 
     try:
-        _client = MongoClient(
-            host=MONGO_HOST,
-            port=MONGO_PORT,
-            serverSelectionTimeoutMS=3000,
-        )
+        # Support full connection URIs (like MongoDB Atlas)
+        if MONGO_HOST.startswith("mongodb://") or MONGO_HOST.startswith("mongodb+srv://"):
+            _client = MongoClient(MONGO_HOST, serverSelectionTimeoutMS=5000)
+            logger.info("Connected to MongoDB Atlas / Cloud")
+        else:
+            _client = MongoClient(
+                host=MONGO_HOST,
+                port=MONGO_PORT,
+                serverSelectionTimeoutMS=3000,
+            )
+            logger.info("Connected to MongoDB at %s:%s", MONGO_HOST, MONGO_PORT)
+        
         _client.admin.command("ping")   # fast liveness check
         _db = _client[MONGO_DB]
-        logger.info("Connected to MongoDB at %s:%s", MONGO_HOST, MONGO_PORT)
     except ConnectionFailure as exc:
         logger.warning("MongoDB unavailable (%s). History/logs disabled.", exc)
         _db = None
