@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import time
+import gc
 from typing import Dict, Optional
 
 from backend.config import (
@@ -67,18 +68,23 @@ def load_model(weights_path: Optional[str] = None, device_str: str = "cpu"):
         return None
 
     try:
+        gc.collect()
         _device = torch.device(device_str if torch.cuda.is_available() and device_str == "cuda" else "cpu")
         validate_class_names(CLASS_NAMES, NUM_CLASSES)
-        model = build_model(pretrained=False, num_classes=NUM_CLASSES) # Ensure architecture matches weights
+        model = build_model(pretrained=False, num_classes=NUM_CLASSES) 
+        gc.collect()
         
         if weights_path and os.path.isfile(weights_path):
-            state_dict = torch.load(weights_path, map_location=_device)
-            payload = unwrap_checkpoint_state_dict(state_dict)
+            payload_raw = torch.load(weights_path, map_location="cpu")
+            payload = unwrap_checkpoint_state_dict(payload_raw)
             validate_checkpoint_head_shape(payload, NUM_CLASSES)
             
-            # CRITICAL: Enforce strict loading to prevent partial (broken) model states
             model.load_state_dict(payload, strict=True)
             _weights_loaded = True
+            
+            del payload_raw
+            del payload
+            gc.collect()
             print(f"EyeNet Integrity Check: 100% Match ({weights_path})")
         else:
             _load_error = f"Weights missing at: {weights_path}"
@@ -88,11 +94,12 @@ def load_model(weights_path: Optional[str] = None, device_str: str = "cpu"):
         model.eval()
         _model = model
         
+        gc.collect()
         _grad_cam = EnsembleGradCAM(_model)
 
-        # Self-Validation Test
         _run_startup_self_test()
         validate_model_prediction_diversity(_model, _device, NUM_CLASSES)
+        gc.collect()
         
     except Exception as e:
         _load_error = f"Integrity Failure: {str(e)}"
