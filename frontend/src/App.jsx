@@ -12,8 +12,7 @@ import {
   Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
 
-const API_URL = import.meta.env.VITE_API_URL || "";
-const API_BASE = (API_URL.replace(/\/+$/, '') + "/api/v1");
+const API_BASE = (import.meta.env.VITE_API_BASE || "/api/v1").replace(/\/+$/, '');
 
 /* ── Tiny helpers ─────────────────────────────────────────── */
 const cls = (...args) => args.filter(Boolean).join(' ');
@@ -266,17 +265,17 @@ const App = () => {
     formData.append('state', patientState);
     try {
       // ✅ NEW — paste this instead
-const resp = await fetch(`${API_BASE}/predict`, { method: 'POST', body: formData });
-if (!resp.ok) {
-  let detail = `Server error (${resp.status})`;
-  try {
-    const errBody = await resp.json();
-    detail = errBody.detail || errBody.message || errBody.error || JSON.stringify(errBody);
-  } catch (_) {
-    detail = await resp.text().catch(() => detail);
-  }
-  throw new Error(detail);
-}
+      const resp = await fetch(`${API_BASE}/predict`, { method: 'POST', body: formData });
+      if (!resp.ok) {
+        let detail = `Server error (${resp.status})`;
+        try {
+          const errBody = await resp.json();
+          detail = errBody.detail || errBody.message || errBody.error || JSON.stringify(errBody);
+        } catch (_) {
+          detail = await resp.text().catch(() => detail);
+        }
+        throw new Error(detail);
+      }
       const data = await resp.json();
       clearInterval(progressRef.current);
       setAnalyzeProgress(100);
