@@ -1,42 +1,37 @@
-# EyeNet Professional Deployment - Unified Container
-# This Dockerfile builds the React frontend and serves it via the FastAPI backend.
+# --- Dockerfile for Hugging Face Spaces (Backend Only) ---
+FROM python:3.10-slim
 
-# ── Phase 1: Build Frontend ──────────────────────────────────────────────────
-FROM node:18-slim AS frontend-builder
-WORKDIR /build-frontend
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ ./
-RUN npm run build
+# Create a non-root user (Hugging Face Requirement)
+RUN useradd -m -u 1000 user
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
 
-# ── Phase 2: Production Server ────────────────────────────────────────────────
-FROM python:3.11-slim-bookworm
+WORKDIR $HOME/app
 
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-ENV FRONTEND_DIR=/app/frontend
-
-WORKDIR /app
-
-# Install system dependencies for OpenCV and AI libraries
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Install system dependencies (OpenCV, etc.)
+USER root
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libgl1-mesa-glx \
     libglib2.0-0 \
-    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
+USER user
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy requirements and install
+COPY --chown=user requirements.txt .
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# Copy backend and database logic
-COPY backend ./backend
-COPY database ./database
-COPY weights ./weights
+# Copy backend code and models
+COPY --chown=user . .
 
-# Copy the built frontend from Phase 1
-COPY --from=frontend-builder /build-frontend/dist ./frontend/dist
+# Environment setup
+ENV ENVIRONMENT=production
+ENV MODEL_WEIGHTS_PATH=./weights/eyenet_ensemble.pth
+ENV MONGODB_DATABASE_NAME=eyenet_db
 
-EXPOSE 8000
+# Hugging Face Spaces strictly requires Port 7860
+EXPOSE 7860
 
-# Start the unified application
-CMD ["uvicorn", "backend.app_server:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start Backend Server
+CMD ["python", "-m", "uvicorn", "backend.app_server:app", "--host", "0.0.0.0", "--port", "7860"]
