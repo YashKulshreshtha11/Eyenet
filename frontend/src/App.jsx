@@ -110,6 +110,7 @@ const App = () => {
   const [historyPage, setHistoryPage] = useState(0);
   const [hasMoreHistory, setHasMoreHistory] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [totalRecords, setTotalRecords] = useState(0);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('analyze');
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -123,6 +124,20 @@ const App = () => {
   const progressRef = useRef(null);
   const analyzeTimeoutRef = useRef(null);
 
+  const resetScan = useCallback(() => {
+    if (progressRef.current) clearInterval(progressRef.current);
+    if (analyzeTimeoutRef.current) clearTimeout(analyzeTimeoutRef.current);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    
+    setFile(null);
+    setPreview(null);
+    setResult(null);
+    setError(null);
+    setAnalyzing(false);
+    setAnalyzeProgress(0);
+    setSelectedRecord(null);
+  }, []);
+
   const fetchHistory = useCallback(async (reset = false) => {
     if (loadingHistory) return;
     setLoadingHistory(true);
@@ -135,6 +150,7 @@ const App = () => {
       if (!resp.ok) return;
       const data = await resp.json();
       const newRecords = data.records || [];
+      setTotalRecords(data.total || 0);
 
       if (reset) {
         setHistory(newRecords);
@@ -161,6 +177,7 @@ const App = () => {
       const resp = await fetch(`${API_BASE}/record/${recordId}`, { method: 'DELETE' });
       if (!resp.ok) throw new Error("Failed to delete record");
       setHistory(prev => prev.filter(r => r.id !== recordId));
+      setTotalRecords(prev => Math.max(0, prev - 1));
       if (selectedRecord?.id === recordId) setSelectedRecord(null);
       setConfirmingDelete(null);
     } catch (err) {
@@ -189,6 +206,7 @@ const App = () => {
       const resp = await fetch(`${API_BASE}/history`, { method: 'DELETE' });
       if (!resp.ok) throw new Error("Failed to clear history");
       setHistory([]);
+      setTotalRecords(0);
       setSelectedRecord(null);
       setConfirmingDeleteAll(false);
     } catch (err) {
@@ -298,14 +316,6 @@ const App = () => {
     window.open(`${API_BASE}/report/${recordId}`, '_blank');
   };
 
-  const resetScan = () => {
-    clearInterval(progressRef.current);
-    clearTimeout(analyzeTimeoutRef.current);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    setFile(null); setPreview(null); setResult(null); setError(null);
-    setAnalyzing(false);
-    setAnalyzeProgress(0);
-  };
 
   const chartColors = ['#00d4e8', '#2979ff', '#f5a623', '#ff3b5c'];
   const diagnosticData = result
@@ -398,7 +408,7 @@ const App = () => {
                   </div>
                   <div className="quick-stat">
                     <FolderOpen size={13} />
-                    <span>{history.length} Records</span>
+                    <span>{totalRecords} Records</span>
                   </div>
                 </div>
 
@@ -457,9 +467,6 @@ const App = () => {
                             <ImageIcon size={12} />
                             <span>{file?.name}</span>
                           </div>
-                          <button className="reset-btn" onClick={(e) => { e.stopPropagation(); resetScan(); }}>
-                            <X size={12} /> Reset
-                          </button>
                         </div>
                       </motion.div>
                     )}
@@ -576,9 +583,16 @@ const App = () => {
                           <div className="chart-wrap">
                             <ResponsiveContainer width="100%" height={200}>
                               <BarChart data={diagnosticData} barSize={28}
-                                margin={{ top: 8, right: 8, left: -28, bottom: 0 }}>
+                                margin={{ top: 8, right: 8, left: -28, bottom: 30 }}>
                                 <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.04)" />
-                                <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 9, fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} />
+                                <XAxis 
+                                  dataKey="name" 
+                                  tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 8, fontFamily: 'DM Mono' }} 
+                                  interval={0}
+                                  height={40}
+                                  axisLine={false} 
+                                  tickLine={false} 
+                                />
                                 <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 9, fontFamily: 'DM Mono' }} axisLine={false} tickLine={false} unit="%" />
                                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
                                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>

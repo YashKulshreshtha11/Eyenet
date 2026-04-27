@@ -132,6 +132,18 @@ def get_history(limit: int = 50, skip: int = 0) -> List[Dict]:
     return history
 
 
+def get_history_count() -> int:
+    """Return the total number of prediction records in the database."""
+    db = get_db()
+    if db is None:
+        return 0
+    try:
+        return db[HIST_COL].count_documents({})
+    except Exception as exc:
+        logger.error("Failed to count history records: %s", exc)
+        return 0
+
+
 def get_record_by_id(record_id: str) -> Optional[Dict]:
     """Retrieve a single prediction record by its string ID."""
     db = get_db()

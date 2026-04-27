@@ -1,7 +1,0 @@
-{
-  "weights": "d:\\Drive_Folder\\final_year_project\\project\\weights\\baseline_resnet18.pth",
-  "best_val_macro_f1": 0.7288,
-  "test_loss": 0.731,
-  "test_accuracy": 0.7083,
-  "test_macro_f1": 0.694
-}

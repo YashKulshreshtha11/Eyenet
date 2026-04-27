@@ -1,0 +1,6 @@
+Actual \ Predicted,Diabetic Retinopathy,Glaucoma,Cataract,Normal,Total
+Diabetic Retinopathy,142,8,12,4,166
+Glaucoma,15,107,18,12,152
+Cataract,5,7,142,3,157
+Normal,8,11,2,141,162
+Total Predicted,170,133,174,160,637

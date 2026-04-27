@@ -1,0 +1,7 @@
+Pathological Class,Precision,Recall (Sensitivity),F1-Score,Support (n)
+Diabetic Retinopathy,0.876,0.855,0.865,166
+Glaucoma,0.810,0.703,0.753,152
+Cataract,0.860,0.904,0.881,157
+Normal (Healthy),0.797,0.876,0.835,162
+OVERALL ACCURACY, , ,0.8367,637
+MACRO F1-SCORE, , ,0.8342, 

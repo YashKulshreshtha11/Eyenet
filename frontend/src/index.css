@@ -437,7 +437,7 @@ body {
 }
 
 .upload-zone::before {
-  content: '->';
+  content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse 60% 40% at 50% 50%, var(--cyan-10), transparent);
@@ -742,7 +742,7 @@ body {
 }
 
 .verdict-card::before {
-  content: '->';
+  content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse 50% 80% at 100% 50%, color-mix(in srgb, var(--vc) 8%, transparent), transparent);
@@ -1753,7 +1753,7 @@ body {
   margin-bottom: 4px;
 }
 
-.destructive-warning-box li::before { content: '->'; color: var(--red); }
+.destructive-warning-box li::before { content: ''; color: var(--red); }
 /* -----------------------------------------------------------------------------
    CLINICAL SUPPORT / DSS STYLES
    Automated Management Protocol UI Components

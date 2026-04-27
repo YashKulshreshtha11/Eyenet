@@ -13,7 +13,7 @@ from backend.models.api_schema import (
 )
 from backend.services import prediction_service as predict_svc
 from backend.services.report_gen import generate_medical_report
-from database.db import delete_all_records, delete_record, get_db, get_history, get_record_by_id, log_event, save_prediction
+from database.db import delete_all_records, delete_record, get_db, get_history, get_history_count, get_record_by_id, log_event, save_prediction
 import tempfile
 import os
 import datetime
@@ -112,7 +112,7 @@ async def prediction_history(limit: int = 50, skip: int = 0):
         record.pop("gradcam_base64", None)
         record.pop("overlay_base64", None)
         records.append(record)
-    return {"records": records, "total": len(records)}
+    return {"records": records, "total": get_history_count()}
 
 
 @router.get("/record/{record_id}", tags=["History"])

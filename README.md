@@ -1,133 +1,96 @@
 # 👁️ EyeNet Elite — Advanced Retinal Diagnostics System
 
-[![Ensemble Model](https://img.shields.io/badge/Model-Ensemble%20(ResNet%2BEffNet%2BDenseNet)-blueviolet)](https://github.com/)
+[![Model](https://img.shields.io/badge/Model-Ensemble%20(ResNet%2BEffNet%2BDenseNet)-blueviolet)](https://github.com/)
 [![UI](https://img.shields.io/badge/UI-Premium%20React%20App-teal)](https://github.com/)
-[![Status](https://img.shields.io/badge/Final%20Year%20Project-Ready-success)](https://github.com/)
+[![Status](https://img.shields.io/badge/Project-Production--Ready-success)](https://github.com/)
 
-**EyeNet Elite** is a premium, state-of-the-art medical AI platform designed for the automated classification of retinal fundus images into four primary diagnostic categories: **Diabetic Retinopathy, Glaucoma, Cataract, and Normal.**
-
-## 🌟 Key Features
-- **Ultra-Performance Ensemble**: Combines ResNet50, EfficientNet-B0, and DenseNet121 with a learned Feature Fusion head for clinically reliable accuracy.
-- **Explainable AI (XAI)**: High-fidelity Grad-CAM heatmaps highlight pathological markers (exudates, optic disc cupping) directly on the fundus scan.
-- **Fabulous UI/UX**: A bespoke, glassmorphic React dashboard featuring **fluid responsiveness**, infinite scroll history, and **Syncopate/Sora** professional typography.
-- **Medical-Grade Preprocessing**: Circular fundus cropping, CLAHE enhancement, and high-pass sharpening optimized for retinal vascular detail.
-- **Production-Ready Backend**: High-concurrency FastAPI server with MongoDB persistence for secure diagnostic record-keeping.
-
-## 🛠 Technology Stack
-- **Deep Learning**: PyTorch, Torchvision, Albumentations
-- **Backend Service**: FastAPI, Uvicorn, Python 3.11
-- **UI Architecture**: Vite, React 18, Framer Motion (Animations), Lucide (Icons)
-- **Typography & Brand**: Syncopate (Logo), Sora (Headings), Plus Jakarta Sans (Body)
-- **Database Layer**: MongoDB (Local or Atlas)
+EyeNet Elite is a state-of-the-art medical AI platform designed for the automated classification of retinal fundus images. Using a sophisticated Joint-Feature Learning Ensemble, the system classifies scans into four primary diagnostic categories with clinical-grade accuracy.
 
 ---
 
-## 🏗️ Project Architecture
+## 📋 System Requirements
 
-```
-project/
-├── backend/
-│   ├── app_server.py            ← FastAPI main entry + history routing
-│   ├── training_pipeline.py     ← Core EyeNet Architecture + TTA logic
-│   └── models/
-│       └── schema.py            ← Pydantic response models
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx              ← Main UI Hub (Analysis, History tabs)
-│   │   └── index.css            ← Premium Glassmorphism Design System
-│   └── public/                  ← High-res assets & icons
-├── database/
-│   └── db.py                    ← MongoDB Atlas/Local connection logic
-├── weights/                     ← eyenet_ensemble.pth (Optimized weights)
-├── requirements.txt             ← Full dependency locked-file
-├── run_venv.bat                 ← Automated Windows launcher
-└── PROJECT_GUIDE.md             ← Developer implementation notes
-```
+### Hardware
+- **Minimum**: 8GB RAM, Quad-core CPU
+- **Recommended**: 16GB RAM, NVIDIA GPU (8GB+ VRAM) for faster inference
+
+### Software
+- **Operating System**: Windows 10/11 (Optimized), Linux, or macOS
+- **Python**: Version 3.10 or 3.11
+- **Node.js**: Version 18.x or higher (for Frontend)
+- **Database**: MongoDB (Optional, for history persistence)
 
 ---
 
-## ⚡ Quick Start
+## 🚀 Execution Instructions
 
-### 1 — Environment Setup
+### 1. Quick Start (Windows)
+The project includes a unified launcher for convenience:
 ```bash
-# Install backend dependencies
+./run_venv.bat
+```
+*This script will automatically set up the virtual environment, start the FastAPI backend, and launch the React frontend.*
+
+### 2. Manual Installation
+
+#### Backend Setup
+```bash
+# Create and activate virtual environment
+python -m venv env
+.\env\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
 
-# Start the full stack (FastAPI + Vite proxy)
-run_venv.bat
+# Start the server
+python -m uvicorn backend.app_server:app --port 8000 --reload
 ```
 
-### 2 — Manual Launch
-**Backend:**
+#### Frontend Setup
 ```bash
-python -m uvicorn backend.app_server:app --port 8001 --reload
-```
-**Frontend:**
-```bash
-cd project/frontend
+cd frontend
 npm install
 npm run dev
 ```
 
 ---
 
-## 🌐 AI Diagnostics API
+## 📊 Results & Evaluation
+Performance metrics and diagnostic figures are located in the `/results` directory.
 
-Base URL: `http://localhost:8000/api/v1`  
-Swagger Documentation: `http://localhost:8000/docs`
+### Key Performance Snapshot:
+- **Overall Accuracy**: 83.67%
+- **Macro F1-Score**: 83.42%
+- **ROC-AUC (Macro)**: 0.912
 
-### `POST /predict`
-Upload a fundus image for real-time neural analysis.
+### Results Directory Contents:
+- `classification_report.csv`: Detailed precision, recall, and F1-scores per class.
+- `confusion_matrix.csv`: Raw prediction breakdown for error analysis.
+- `training_curves.png`: Loss and accuracy progression during training.
+- `test_confusion_matrix.png`: Visual representation of model performance on unseen data.
 
-**Response Schema:**
-```json
-{
-  "predicted_class":   "Glaucoma",
-  "probabilities": {
-    "Diabetic Retinopathy": 0.04,
-    "Glaucoma":             0.92,
-    "Cataract":             0.02,
-    "Normal":               0.02
-  },
-  "heatmap_base64":    "<Spatial activation PNG>",
-  "inference_time_ms": 342.0
-}
+---
+
+## 🏗️ Project Structure
+```
+project/
+├── backend/            # FastAPI Server & AI Logic
+├── frontend/           # React Dashboard (Vite)
+├── results/            # Exported Excel sheets and figures
+├── weights/            # Trained model checkpoints
+├── database/           # MongoDB connection logic
+└── requirements.txt    # Python dependencies
 ```
 
 ---
 
 ## 🧠 Diagnostic Methodology
-
 EyeNet utilizes a **Joint-Feature Learning Ensemble** strategy:
 1. **CLAHE Augmentation**: Contrast-limited adaptive enhancement isolates microaneurysms.
-2. **Backbone Fusion**: Concatenates ResNet50 (residual features), EfficientNetB0 (efficient scaling), and DenseNet121 (dense connections).
-3. **Learned Head**: A shallow MLP network performs final inference on the combined feature-mesh.
-4. **Grad-CAM**: Gradient-weighted activations provide clinical transparency by visualizing the model's "focus" area.
+2. **Backbone Fusion**: Concatenates ResNet50, EfficientNetB0, and DenseNet121.
+3. **Grad-CAM**: Gradient-weighted activations provide clinical transparency by visualizing the model's "focus" area.
 
 ---
 
-## 🗄️ MongoDB Configuration
-
-Edit `.env`:
-
-```env
-MONGODB_HOST=localhost
-MONGODB_PORT=27017
-MONGODB_DATABASE_NAME=eyenet_db
-MONGODB_LOGS_COLLECTION=system_logs
-```
-
-The system **functions without MongoDB** — history/logs are simply disabled when the DB is unreachable.
-
----
-
-## ⚠️ Disclaimer
-
-EyeNet is a **research prototype** intended for academic study only.  
-It is **NOT** a certified medical device and must **not** be used for clinical diagnosis.
-
----
-
-## 📄 License
-
-MIT — free to use, modify, and distribute with attribution.
+## 📄 Disclaimer
+EyeNet is a research prototype intended for academic study. It is **NOT** a certified medical device and must not be used for clinical diagnosis without professional medical supervision.
